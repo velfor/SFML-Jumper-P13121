@@ -1,7 +1,7 @@
 #include "player.h"
 #include "settings.h"
 Player::Player() {
-	texture.loadFromFile("images/Players/bunny1_ready.png");
+	texture.loadFromFile(PLAYER_READY_IMG);
 	texture.setSmooth(true);
 	sprite.setTexture(texture);
 	sprite.setScale(0.5f, 0.5f);
@@ -10,13 +10,14 @@ Player::Player() {
 	sprite.setPosition(pos);
 }
 void Player::update() {
-	acc = sf::Vector2f(0.f, 0.f);
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-		acc.x = -0.5f;
+	acc = sf::Vector2f(0.f, GRAVITY);
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) { acc.x = -PLAYER_ACC_X; }
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) { acc.x = PLAYER_ACC_X; }
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && !isJump) { 
+		isJump = true;
+		speed.y = PLAYER_JUMP_SPEED; 
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-		acc.x = 0.5f;
-	}
+	acc.x += speed.x * PLAYER_FRICTION;
 	speed += acc;
 	pos += speed + sf::Vector2f(acc.x * 0.5, acc.y * 0.5);
 	if (pos.x < 0 - getHitBox().width / 2) {
