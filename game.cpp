@@ -32,6 +32,28 @@ void Game::update() {
 	for (auto it = platforms.begin(); it != platforms.end(); it++) {
 		(*it)->update();
 	}
+	//если игрок забрался выше 1/4 высоты экрана
+	if (player.getPosition().y <= WINDOW_HEIGHT / 4.f) {
+		//player.setPosition(player.getPosition().x, 
+		//	player.getPosition().y + abs(player.getSpeed().y));
+		for (auto it = platforms.begin(); it != platforms.end(); it++) {
+			(*it)->setPosition((*it)->getPosition().x,
+				(*it)->getPosition().y + abs(player.getSpeed().y));
+			if ((*it)->getPosition().y > WINDOW_HEIGHT) {
+				(*it)->setDelTrue();
+			}
+		}
+	}
+	//удаляем помеченные платформы
+	platforms.remove_if([](Platform* p) {return p->getDel(); });
+	//создаем новые платформы
+	while (platforms.size() <= PLATFORMS_QTY) {
+		int new_width = rand() % 81 + 80;
+		float new_x = rand() % static_cast<int>((WINDOW_WIDTH - new_width));
+		float new_y = rand() % 101 - 150;
+		Platform* p = new Platform(new_x, new_y, new_width, 50.f);
+		platforms.push_back(p);
+	}
 }
 void Game::draw() {
 	window.clear();

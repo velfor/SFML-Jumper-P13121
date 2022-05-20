@@ -10,6 +10,7 @@ private:
 	float y;
 	float width;
 	float height;
+	bool del = false;
 public:
 	Platform(float fx, float fy, float fwidth, float fheight):
 		x{ fx }, y{ fy }, width{ fwidth }, height{ fheight }
@@ -23,4 +24,7 @@ public:
 	void update() {}
 	void draw(sf::RenderWindow& window) { window.draw(sprite); }
 	sf::Vector2f getPosition() { return sf::Vector2f(x, y); }
+	void setPosition(float x, float y) { sprite.setPosition(x, y); }
+	bool getDel() { return del; }
+	void setDelTrue() { del = true; }
 };

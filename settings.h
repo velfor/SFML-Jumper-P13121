@@ -10,3 +10,4 @@ const float GRAVITY = 0.5;
 const float PLAYER_JUMP_SPEED = -20;
 const std::string PLAYER_READY_IMG = "images/Players/bunny1_ready.png";
 const std::string PLATFORM_IMG = "images/Environment/ground_cake.png";
+const size_t PLATFORMS_QTY = 8;
