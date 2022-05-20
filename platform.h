@@ -4,27 +4,33 @@
 
 class Platform {
 private:
-	sf::Sprite sprite;
 	sf::Texture texture;
-	float x;
-	float y;
+	sf::Sprite sprite;
+	sf::Vector2f pos;
 	float width;
 	float height;
 	bool del = false;
 public:
-	Platform(float fx, float fy, float fwidth, float fheight):
-		x{ fx }, y{ fy }, width{ fwidth }, height{ fheight }
-	{
-		texture.loadFromFile(PLATFORM_IMG);
+	Platform(float x, float y, float width, float height) {
+		texture.loadFromFile(
+			IMAGES_FOLDER +
+			PLATFORM_IMAGES_FOLDER +
+			PLATFORM_IMAGE_FILENAME);
 		sprite.setTexture(texture);
-		sprite.setScale(width / getHitBox().width, height / getHitBox().height);
+		sf::FloatRect g_bounds = sprite.getGlobalBounds();
+		sprite.setScale(width/g_bounds.width, height/g_bounds.height);
 		sprite.setPosition(x, y);
 	}
-	sf::FloatRect getHitBox() { return sprite.getGlobalBounds(); }
 	void update() {}
-	void draw(sf::RenderWindow& window) { window.draw(sprite); }
-	sf::Vector2f getPosition() { return sf::Vector2f(x, y); }
-	void setPosition(float x, float y) { sprite.setPosition(x, y); }
+	void draw(sf::RenderWindow& window) {
+		window.draw(sprite);
+	}
+	sf::FloatRect getHitBox() { return sprite.getGlobalBounds(); }
+	sf::Vector2f getPosition() { return sprite.getPosition(); }
+	void setPosition(sf::Vector2f pos) { sprite.setPosition(pos); }
+	void setPosition(float x, float y) {
+		sprite.setPosition(sf::Vector2f(x, y));
+	}
 	bool getDel() { return del; }
-	void setDelTrue() { del = true; }
+	void setDel() { del = true; }
 };
