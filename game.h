@@ -4,6 +4,7 @@
 #include "player.h"
 #include "platform.h"
 #include "splash.h"
+#include "text.h"
 
 class Game {
 public:
@@ -17,6 +18,8 @@ private:
 	Player player;
 	std::list<Platform*> platform_sprites;
 	SplashScreen game_over_screen;
+	size_t score = 0;
+	TextObject score_text;
 
 	void check_events();
 	void update();

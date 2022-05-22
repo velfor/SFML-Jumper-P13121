@@ -1,8 +1,9 @@
 #include "game.h"
 
 Game::Game() : 
-	window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Jumper"),
-	game_over_screen("images/game_over.png")
+	window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE),
+	game_over_screen(GAME_OVER_IMAGE_FILENAME),
+	score_text(IMAGES_FOLDER + "kenvector_future.ttf", 48, 20,20, sf::Color::White)
 {
 	//в самом низу экрана шириной на весь экран
 	Platform* p1 = new Platform(0, WINDOW_HEIGHT - 55.f, 
@@ -32,6 +33,19 @@ void Game::check_events() {
 		if (event.type == sf::Event::Closed)
 			// тогда закрываем его
 			window.close();
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space){
+			//двигаем игрока на 1 пиксель вниз
+			player.setPositionIncY();
+			//если есть пересечение с платформой
+			for (auto iter = platform_sprites.begin(); iter != platform_sprites.end(); iter++) {
+				if (player.getHitBox().intersects((*iter)->getHitBox())) {
+					//то прыжок
+					player.jump();
+				}
+			}
+			//двигаем игрока на 1 пиксель вверх
+			player.setPositionIncY();
+		}
 	}
 }
 void Game::update() {
@@ -53,26 +67,37 @@ void Game::update() {
 		if (player.getPosition().y <= WINDOW_HEIGHT / 3.f) {
 			for (auto iter = platform_sprites.begin();
 				iter != platform_sprites.end(); iter++) {
-				(*iter)->setPosition((*iter)->getPosition().x,
-					(*iter)->getPosition().y + abs(player.getSpeed().y));
-				//платформы, которые опустились ниже 4/3 высоты экрана 
+				if (player.getPosition().y > 0) {
+					(*iter)->setPosition((*iter)->getPosition().x,
+						(*iter)->getPosition().y + 15.f);
+				}
+				else
+				{
+					(*iter)->setPosition((*iter)->getPosition().x,
+						(*iter)->getPosition().y + 45.f);
+				}
+				//платформы, которые опустились ниже 5/4 высоты экрана 
 				//помечаем на удаление
-				if ((*iter)->getPosition().y > 4 * WINDOW_HEIGHT / 3) {
+				if ((*iter)->getPosition().y > 5 * WINDOW_HEIGHT / 4) {
 					(*iter)->setDel();
+					score++;
 				}
 			}
 		}
 		//удаляем ненужные платформы
 		platform_sprites.remove_if([](Platform* p) {
 			return p->getDel(); });
+		//спавн глвых платформ
 		while (platform_sprites.size() < PLATFORMS_QTY) {
 			int len = rand() % 151 + 100;
 			int new_x = rand() % (static_cast<int>(
 				WINDOW_WIDTH - len));
-			int new_y = rand() % 451 - 300;
+			int new_y = rand() % static_cast<int>(player.getPosition().y) - 250;
 			Platform* p = new Platform(new_x, new_y, len, 55.f);
 			platform_sprites.push_back(p);
 		}
+		//обновляем счет
+		score_text.update(score);
 		break;
 	}
 	case GameState::GAME_OVER:
@@ -90,6 +115,7 @@ void Game::draw() {
 			iter != platform_sprites.end(); iter++) {
 			(*iter)->draw(window);
 		}
+		score_text.draw(window);
 		break;
 	case GameState::GAME_OVER:
 		game_over_screen.draw(window);
@@ -98,24 +124,19 @@ void Game::draw() {
 	window.display();
 }
 void Game::check_collisions() {
-	for (auto iter = platform_sprites.begin();
-		iter != platform_sprites.end(); iter++) {
-		if (player.getSpeed().y > 0) {
+	if (player.getSpeed().y > 0) {
+		for (auto iter = platform_sprites.begin();
+			iter != platform_sprites.end(); iter++) {
 			if (player.getHitBox().intersects((*iter)->getHitBox())) {
-				if (player.getSpeed().y >= 0) {
-					player.setIsJumping(false);
 					player.resetSpeed();
 					sf::Vector2f platform_pos = (*iter)->getPosition();
 					sf::Vector2f player_new_pos =
 						sf::Vector2f(player.getPosition().x,
 							platform_pos.y - player.getHitBox().height);
 					player.setPosition(player_new_pos);
-				}
+				
 			}
 		}
-		
-			
-		
 	}
 }
 
